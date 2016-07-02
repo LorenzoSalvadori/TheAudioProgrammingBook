@@ -10,8 +10,8 @@
 
 int main() 
 {
-	int midinote, ppd;
-	double frequency, freq2mid, pitchdeviation;
+	int midinote, ppd, midi1, midi2;
+	double frequency, freq2mid, midi2freq, pitchdeviation, delta, delta1, delta2, f, f1, f2;
 	char message[256];	// here we store the user input
 	char* result;		// here we point at the user input to check wether errors happen
 	
@@ -56,20 +56,33 @@ int main()
 		main();
 	}
 
-	// let's do some math now
+	// let's do some math now! Midis first...
 	freq2mid = (69 + (12 * log2(frequency / 440))) + 0.5;
 	midinote = (int)freq2mid;
+	midi1 = midinote;
+	midi2 = midinote + 1;
+	midi2freq = pow(2, (double)(midinote - 69) / (double)12) * 440;
 
-	// this next calc is WRONG!! also need some way to convert back midi to freq... -_-
-	pitchdeviation = freq2mid - (double)midinote;
-
-	if (pitchdeviation > 0.5) {
-		midinote ++;
+	// like a real frequency gentleman would...
+	f = frequency;
+	f1 = pow(2, (double)(midi1 - 69) / (double)12) * 440;
+	f2 = pow(2, (double)(midi2 - 69) / (double)12) * 440;
+	delta2 = f - f2;
+	delta1 = f - f1;
+	delta = f2 - f1;
+	
+	// if if if...
+	if (delta2 < delta1){
+		ppd = (int)((delta2/delta) *100);
+		midinote = midi2;
+	}
+	
+	else if (delta1 < delta2){
+		ppd = (int)((delta1/delta) *100);
+		midinote = midi1;
 	}
 
-	// pitch percentage deviation is...
-	ppd = (int)((freq2mid - (double)midinote) * 100);
-
+	
 	printf("The MIDI note corresponding to the frequency you entered is: %d\n", midinote);
 	printf("and its pitch deviation percentage is: %d%%.\n", ppd);
 	printf("It's been a pleasure working with you. Have a nice day!\n");
