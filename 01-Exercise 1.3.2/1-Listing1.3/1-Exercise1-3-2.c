@@ -11,7 +11,7 @@
 int main() 
 {
 	int midinote, ppd, midi1, midi2;
-	double frequency, freq2mid, midi2freq, pitchdeviation, delta, delta1, delta2, f, f1, f2;
+	double frequency, freq2mid, midi2freq, pitchdeviation, delta, delta1, delta2, f, f1, f2, deltaMidi1, deltaMidi2;
 	char message[256];	// here we store the user input
 	char* result;		// here we point at the user input to check wether errors happen
 	
@@ -57,27 +57,31 @@ int main()
 	}
 
 	// let's do some math now! Midis first...
-	freq2mid = (69 + (12 * log2(frequency / 440))) + 0.5;
+	freq2mid = (69 + (12 * log2(frequency / 440)));
 	midinote = (int)freq2mid;
 	midi1 = midinote;
 	midi2 = midinote + 1;
 	midi2freq = pow(2, (double)(midinote - 69) / (double)12) * 440;
+	deltaMidi1 = freq2mid - midi1;
+	deltaMidi2 = freq2mid - midi2;
 
 	// like a real frequency gentleman would...
 	f = frequency;
 	f1 = pow(2, (double)(midi1 - 69) / (double)12) * 440;
 	f2 = pow(2, (double)(midi2 - 69) / (double)12) * 440;
+	delta = f2 - f1;
+	f = frequency;
 	delta2 = f - f2;
 	delta1 = f - f1;
 	delta = f2 - f1;
 	
 	// if if if...
-	if (delta2 < delta1){
+	if (fabs(deltaMidi2) < fabs(deltaMidi1)){
 		ppd = (int)((delta2/delta) *100);
 		midinote = midi2;
 	}
 	
-	else if (delta1 < delta2){
+	else if (fabs(deltaMidi1) <= fabs(deltaMidi2)){
 		ppd = (int)((delta1/delta) *100);
 		midinote = midi1;
 	}
