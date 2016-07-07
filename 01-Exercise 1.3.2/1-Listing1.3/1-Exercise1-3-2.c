@@ -66,7 +66,6 @@ int main()
 	deltaMidi2 = freq2mid - midi2;
 
 	// like a real frequency gentleman would...
-	f = frequency;
 	f1 = pow(2, (double)(midi1 - 69) / (double)12) * 440;
 	f2 = pow(2, (double)(midi2 - 69) / (double)12) * 440;
 	delta = f2 - f1;
@@ -77,12 +76,12 @@ int main()
 	
 	// if if if...
 	if (fabs(deltaMidi2) < fabs(deltaMidi1)){
-		ppd = (int)((delta2/delta) *100);
+		ppd = (int)(floor(((delta2/delta) *100)));
 		midinote = midi2;
 	}
 	
 	else if (fabs(deltaMidi1) <= fabs(deltaMidi2)){
-		ppd = (int)((delta1/delta) *100);
+		ppd = (int)(floor(((delta1/delta) *100)));
 		midinote = midi1;
 	}
 

@@ -25,6 +25,7 @@ int main()
 		return 1;
 	}
 
+
 	midinote = atoi(message);
 
 	if (midinote < 0){
@@ -36,6 +37,7 @@ int main()
 		printf("Sorry - %s is beyond the MIDI range!\n", message);
 		return 1;
 	}
+
 	frequency = c0*pow(semitone_ratio, midinote);
 	printf("frequency of MIDI note %d = %f\n", midinote, frequency);
 	return 0;
