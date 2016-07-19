@@ -5,11 +5,44 @@
 int main(int argc, char* argv[]) 
 {
 	// check if the number of argument is correct
-	if (argc != 2) {
+	if (argc < 2 || argc > 4) {
 		printf("%s converts a frequency into a MIDI note and its pitch percentage deviation\n", argv[0]);
-		printf("usage: %s frequency\n", argv[0]);
-		printf("range: TBD");
+		printf("usage: %s frequency (Atuning) (OctaveDivision)\n", argv[0]);
+		printf("frequency range: TBD\n");
+		printf("Optional - A tuning range: 415 Hz, 466 Hz (default is 440 Hz)\n");
+		printf("Optional - Octave division range: 5-TET, 72-TET (default is 12)\n");
 		return 1;
+	}
+	
+	if (argv[2] == NULL) {
+		const double a_tuning = 440;		
+		const int octavedivision = 12;
+	}
+	
+	if (argv[3] == NULL) {
+		if (5 <= atof(argv[2]) <= 72) {
+			const double a_tuning = 440;
+			const int octavedivision = atof(argv[2]);
+		}
+		else if (415 <= atof(argv[2]) <= 466) {
+			const double a_tuning = atof(argv[2]);
+			const int octavedivision = 12;
+		}
+		else {
+			printf("Sorry, the value you entered for either A tuning or for octave division is not correct.\nPlease try again. Thank you.\n");
+			return 1;
+		}
+	}
+
+	if (argv[3] != NULL) {
+		if (415 <= atof(argv[2]) <= 466) {
+			const double a_tuning = atof(argv[2]);
+		}
+		else if (atof(argv[2]) < 415 || atof(argv[2]) > 466) {
+			printf("Sorry, the value you entered for A tuning is not correct.\nPlease try again. Thank you.\n");
+			return 1;
+		}
+		// TODO: add octave division
 	}
 
 	// TODO regex validation on input - is argv[1] a positive double? is there a range and does the input stays whithin?
@@ -21,8 +54,6 @@ int main(int argc, char* argv[])
 	int midinote, pitchpercdev;
 	int midi1, midi2;
 	const int a4 = 69;
-	const double a_tuning = 440;		// TODO: add cases for different A tuning
-	const int octavedivision = 12;		// TODO: add cases for different octave division
 
 	freq = atof(argv[1]);
 
