@@ -4,8 +4,8 @@
 
 int main(int argc, char* argv[]) 
 {
-	// check if the number of argument is correct
-	if (argc < 2 || argc > 4) {
+	// check if the number of argument is not correct
+	if (argc < 2 || argc > 4) { //print error
 		printf("%s converts a frequency into a MIDI note and its pitch percentage deviation\n", argv[0]);
 		printf("usage: %s frequency (Atuning) (OctaveDivision)\n", argv[0]);
 		printf("frequency range: TBD\n");
@@ -13,39 +13,76 @@ int main(int argc, char* argv[])
 		printf("Optional - Octave division range: 5-TET, 72-TET (default is 12)\n");
 		return 1;
 	}
-	
+
+	// TODO: argv[] is a pointer and I cannot compare it to a string - FIX NEEDED
+
+	// validation on input - is argv[1] a double? is argv[2] a double? is argv[3] an int?
+	if (atod(argv[1]) == 0 && argv[1] != '0') { //print error
+		printf("Sorry, the first value you entered is not in the correct format.\nPlease try again. Thank you.\n");
+		return 1;
+	}
+
+	if (argv[2] != NULL && atod(argv[2]) == 0 && argv[2] != '0') { //print error
+		printf("Sorry, the second value you entered is not in the correct format.\nPlease try again. Thank you.\n");
+		return 1;
+	}
+
+	if (argv[3] != NULL && atod(argv[3]) == 0 && argv[3] != '0') { //print error
+		printf("Sorry, the third value you entered is not in the correct format.\nPlease try again. Thank you.\n");
+		return 1;
+	}
+
+	// define ranges for A-tuning and octave division, and their defaults
+	const int atune_min = 415;
+	const int atune_max = 466;
+	const int od_min = 5;
+	const int od_max = 72;
+	const int atune_default = 440;
+	const int od_default = 12;
+
+
+	// if no option for A-tuning was specified then use default ones
 	if (argv[2] == NULL) {
-		const double a_tuning = 440;		
-		const int octavedivision = 12;
+		const double a_tuning = atune_default;		
+		const int octavedivision = od_default;
 	}
 	
+	// if one option is specified then check whether it is in the A-tuning range or in the octave division range
+	// then assign the input accordingly, and the default value to the other
 	if (argv[3] == NULL) {
-		if (5 <= atof(argv[2]) <= 72) {
-			const double a_tuning = 440;
-			const int octavedivision = atof(argv[2]);
+		if (od_min <= atoi(argv[2]) <= od_max) {
+			const double a_tuning = atune_default;
+			const int octavedivision = atoi(argv[2]);
 		}
-		else if (415 <= atof(argv[2]) <= 466) {
+		else if (atune_min <= atod(argv[2]) <= atune_max) {
 			const double a_tuning = atof(argv[2]);
-			const int octavedivision = 12;
+			const int octavedivision = od_default;
 		}
-		else {
+		else { //print error
 			printf("Sorry, the value you entered for either A tuning or for octave division is not correct.\nPlease try again. Thank you.\n");
 			return 1;
 		}
 	}
 
+	// if both options are specified check that each one is whithin range and then assign the values accordingly
 	if (argv[3] != NULL) {
-		if (415 <= atof(argv[2]) <= 466) {
+		// tuning division
+		if (atune_min <= atod(argv[2]) <= atune_max) {
 			const double a_tuning = atof(argv[2]);
 		}
-		else if (atof(argv[2]) < 415 || atof(argv[2]) > 466) {
-			printf("Sorry, the value you entered for A tuning is not correct.\nPlease try again. Thank you.\n");
+		else if (atod(argv[2]) < atune_min || atod(argv[2]) > atune_max) { //print error
+			printf("Sorry, the value you entered for A tuning is not whithin the allowed range.\nPlease try again. Thank you.\n");
 			return 1;
 		}
-		// TODO: add octave division
+		// octave division
+		if (od_min <= atoi(argv[3]) <= od_max) {
+			const int octavedivision = atoi(argv[3]);
+		}
+		else if (atoi(argv[3]) < od_min || atoi(argv[3]) > od_max) { //print error
+			printf("Sorry, the value you entered for the octave division is not whithin the allowed range.\nPlease try again. Thank you.\n");
+			return 1;
+		}
 	}
-
-	// TODO regex validation on input - is argv[1] a positive double? is there a range and does the input stays whithin?
 
 	// if everything is fine then we can declare the variables we need
 	double freq, freq1, freq2, delta, delta1, delta2;
@@ -55,10 +92,10 @@ int main(int argc, char* argv[])
 	int midi1, midi2;
 	const int a4 = 69;
 
-	freq = atof(argv[1]);
+	freq = atod(argv[1]);
 
 
-	freq2mid = (a4 + (octavedivision*log2(freq/a_tuning)));
+	freq2mid = (a4 + (octavedivision*log2(freq/ a_tuning))); // TODO: gives error for undefined octavedivision and a_tuning - FIX NEEDED
 	
 	midi1 = midinote;
 	midi2 = midinote + 1;
@@ -83,7 +120,5 @@ int main(int argc, char* argv[])
 		ppd = (int)(floor(((delta1 / delta) * 100)));
 		midinote = midi1;
 	}
-
-
 
 }
