@@ -14,20 +14,18 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	// TODO: argv[] is a pointer and I cannot compare it to a string - FIX NEEDED
-
 	// validation on input - is argv[1] a double? is argv[2] a double? is argv[3] an int?
-	if (atod(argv[1]) == 0 && argv[1] != '0') { //print error
+	if (atof(argv[1]) == 0 && *argv[1] != '0') { //print error
 		printf("Sorry, the first value you entered is not in the correct format.\nPlease try again. Thank you.\n");
 		return 1;
 	}
 
-	if (argv[2] != NULL && atod(argv[2]) == 0 && argv[2] != '0') { //print error
+	if (argv[2] != NULL && atof(argv[2]) == 0 && *argv[2] != '0') { //print error
 		printf("Sorry, the second value you entered is not in the correct format.\nPlease try again. Thank you.\n");
 		return 1;
 	}
-
-	if (argv[3] != NULL && atod(argv[3]) == 0 && argv[3] != '0') { //print error
+	
+	if (argv[3] != NULL && atof(argv[3]) == 0 && *argv[3] != '0') { //print error
 		printf("Sorry, the third value you entered is not in the correct format.\nPlease try again. Thank you.\n");
 		return 1;
 	}
@@ -39,24 +37,25 @@ int main(int argc, char* argv[])
 	const int od_max = 72;
 	const int atune_default = 440;
 	const int od_default = 12;
-
+	double a_tuning;
+	int octavedivision;
 
 	// if no option for A-tuning was specified then use default ones
 	if (argv[2] == NULL) {
-		const double a_tuning = atune_default;		
-		const int octavedivision = od_default;
+		a_tuning = atune_default;	
+		octavedivision = od_default;
 	}
 	
 	// if one option is specified then check whether it is in the A-tuning range or in the octave division range
 	// then assign the input accordingly, and the default value to the other
 	if (argv[3] == NULL) {
 		if (od_min <= atoi(argv[2]) <= od_max) {
-			const double a_tuning = atune_default;
-			const int octavedivision = atoi(argv[2]);
+			a_tuning = atune_default;
+			octavedivision = atoi(argv[2]);
 		}
-		else if (atune_min <= atod(argv[2]) <= atune_max) {
-			const double a_tuning = atof(argv[2]);
-			const int octavedivision = od_default;
+		else if (atune_min <= atof(argv[2]) <= atune_max) {
+			a_tuning = atof(argv[2]);
+			octavedivision = od_default;
 		}
 		else { //print error
 			printf("Sorry, the value you entered for either A tuning or for octave division is not correct.\nPlease try again. Thank you.\n");
@@ -67,16 +66,16 @@ int main(int argc, char* argv[])
 	// if both options are specified check that each one is whithin range and then assign the values accordingly
 	if (argv[3] != NULL) {
 		// tuning division
-		if (atune_min <= atod(argv[2]) <= atune_max) {
-			const double a_tuning = atof(argv[2]);
+		if (atune_min <= atof(argv[2]) <= atune_max) {
+			a_tuning = atof(argv[2]);
 		}
-		else if (atod(argv[2]) < atune_min || atod(argv[2]) > atune_max) { //print error
+		else if (atof(argv[2]) < atune_min || atof(argv[2]) > atune_max) { //print error
 			printf("Sorry, the value you entered for A tuning is not whithin the allowed range.\nPlease try again. Thank you.\n");
 			return 1;
 		}
 		// octave division
 		if (od_min <= atoi(argv[3]) <= od_max) {
-			const int octavedivision = atoi(argv[3]);
+			octavedivision = atoi(argv[3]);
 		}
 		else if (atoi(argv[3]) < od_min || atoi(argv[3]) > od_max) { //print error
 			printf("Sorry, the value you entered for the octave division is not whithin the allowed range.\nPlease try again. Thank you.\n");
@@ -92,11 +91,12 @@ int main(int argc, char* argv[])
 	int midi1, midi2;
 	const int a4 = 69;
 
-	freq = atod(argv[1]);
+	freq = atof(argv[1]);
 
 
-	freq2mid = (a4 + (octavedivision*log2(freq/ a_tuning))); // TODO: gives error for undefined octavedivision and a_tuning - FIX NEEDED
-	
+	freq2mid = (a4 + (octavedivision*log2(freq/ a_tuning)));
+	midinote = (int)freq2mid;
+
 	midi1 = midinote;
 	midi2 = midinote + 1;
 	deltaMidi1 = freq2mid - midi1;
