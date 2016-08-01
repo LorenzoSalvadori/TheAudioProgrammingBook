@@ -40,6 +40,7 @@ int main(int argc, char* argv[])
 	frequency = c0 * pow(ratio, midinote);	//finds the frequency corresponding to the user input MIDI note
 	
 	// for loops logic
+	
 	int i;
 	for (i = 0; i < notes; i++)
 	{
@@ -53,10 +54,41 @@ int main(int argc, char* argv[])
 		printf("%d: %f \n", i, intervals[i]);
 	}
 	
-	//TODO: now try with while loops logic - comment the other logics first
+	
+	// while loops logic
+/*	
+	int i = 0;
+	while (i < notes)
+	{
+		intervals[i++] = frequency;
+		frequency *= ratio;
+	}
+	
+	printf("The frequencies of the notes in the octave are:\n");
+	i = 0;
+	while (i < notes)
+	{
+		printf("%d: %f \n", i, intervals[i++]);
+	}
+*/	
 
-	//TODO: and now with do while loops logic - comment the other logics first
+	//do while loops logic
+/*
+	int i = 0;
+	do
+	{
+		intervals[i++] = frequency;
+		frequency *= ratio;
+	} while (i < notes);
 
+	printf("The frequencies of the notes in the octave are:\n");
+	i = 0;
+
+	do
+	{
+		printf("%d: %f \n", i, intervals[i++]);
+	} while (i < notes);
+*/
 	return 0;
 
 }
