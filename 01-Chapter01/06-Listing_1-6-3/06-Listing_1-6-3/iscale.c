@@ -11,7 +11,7 @@ outfile.txt: name of (optional) file to output to
 #include<stdlib.h>
 #include<math.h>
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {
 	// global variables declaration
 	int notes, i;
@@ -84,10 +84,10 @@ int main(int argc, char* argv[])
 
 	// check for the optional output file
 	fp = NULL;
-	if (argc == 4) 
+	if (argc == 4)
 	{
-		fp = fopen(argv[3], "w");
-		if (fp == NULL) 
+		fp = fopen_s(argv[3], *argv[3], "w");
+		if (fp == NULL)
 		{
 			printf("WARNING: unable to create file %s\n", argv[3]);
 			perror(""); //
@@ -96,5 +96,47 @@ int main(int argc, char* argv[])
 
 	// if we got here the user has been nice and we can perform the operations
 
+	if (ismidi)
+	{
+		double c0, c5;
+		ratio = pow(2.0, 1.0 / 12.0);
+		c5 = 220 * pow(ratio, 3);
+		c0 = c5 * pow(2.0, -5.0);
+		basefreq = c0*pow(ratio, startval);
+	}
 
-}		
+	else
+		basefreq = startval;
+
+	ratio = pow(2.0, 1.0 / notes);
+	for (i = 0; i < notes; i++)
+	{
+		intervals[i] = basefreq;
+		basefreq *= ratio;
+	}
+
+	for (i = 0; i < notes; i++)
+	{
+		if (write_interval)
+			printf("%d:\t%f\t%f\n", i, pow(ratio, i), intervals[i]);
+		else
+			printf("%d:\t%f\n", i, intervals[i]);
+
+		if (fp)
+		{
+			if (write_interval)
+				err = fprintf(fp, "%d:\t%f\t%f\n", i, pow(ratio, i), intervals[i]);
+			else
+				printf("%d:\t%f\n", i, intervals[i]);
+			if (err < 0)
+				break;
+		}
+	}
+
+	if (err < 0)
+		perror("There was an error writing the file.\n");
+	if (fp)
+		fclose(fp);
+
+	return 0;
+}
