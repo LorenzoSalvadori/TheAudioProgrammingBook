@@ -10,7 +10,7 @@ outfile.txt: name of (optional) file to output to
 #include<stdio.h>
 #include<stdlib.h>
 #include<math.h>
-
+#include<errno.h>
 int main(int argc, char* argv[])
 {
 	// global variables declaration
@@ -20,10 +20,11 @@ int main(int argc, char* argv[])
 	int err = 0;
 	double startval, basefreq, ratio;
 	FILE* fp;
+	errno_t errfp;
 	double intervals[25];
 
 	// check for '-' sign (a flag) in argv[i][0] step through the pointer with argv++ and argc--
-
+	
 	while (argc > 1)
 	{
 		if (argv[1][0] == '-')
@@ -50,13 +51,24 @@ int main(int argc, char* argv[])
 	if (argc < 3)
 	{
 		printf("Error: insufficient arguments.\n");
-		printf("Usage: iscale [-m] [-i] N startval [outfile.txt]\n");
+		printf("Usage: iscale [-m] [-i] N startval [outfile.txt]\n"
+			"-m: interpret startval as a MIDI note (default: interpret as frequency in Hertz)\n"
+			"-i: print interval ratios as well as frequency values(default: print just frequency values)\n"
+			"outfile.txt : name of(optional) file to output to");
 		return 1;
 	}
 
 	// if we got here we should have the correct amount of arguments to process
+	
+	// first of all lets check that the user hasn't entered characters instead of numbers
+	while (atoi(argv[1] == 0) 
+	{
+		printf("An invalid character has been entered: skipping it...");
+		argc--;
+		argv++;
+	}
+	
 	// now on to check if the inputs are whithin range
-
 	notes = atoi(argv[1]);
 	if (notes < 1 || notes > 24)
 	{
@@ -86,7 +98,9 @@ int main(int argc, char* argv[])
 	fp = NULL;
 	if (argc == 4)
 	{
-		fp = fopen_s(argv[3], *argv[3], "w");
+		errfp = fopen_s(&fp, *argv[3], "w");
+		if (errfp == 0)
+			printf("no errors in err: %s", err);
 		if (fp == NULL)
 		{
 			printf("WARNING: unable to create file %s\n", argv[3]);
