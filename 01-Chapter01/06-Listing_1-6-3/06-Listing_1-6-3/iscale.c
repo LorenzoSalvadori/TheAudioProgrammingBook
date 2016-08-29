@@ -1,9 +1,10 @@
 /*
 command line tool that prints a scale with options
-iscale [-m] [-i] N startval [outfile.txt]
+iscale [-m] [-i] [-a] N startval [outfile.txt]
 
 -m: interpret startval as a MIDI note (default: interpret as frequency in Hertz)
 -i: print interval ratios as well as frequency values (default: print just frequency values)
+-a: appends output to outfile.txt instead of overwriting it
 outfile.txt: name of (optional) file to output to
 */
 
@@ -11,6 +12,7 @@ outfile.txt: name of (optional) file to output to
 #include<stdlib.h>
 #include<math.h>
 #include<errno.h>
+
 int main(int argc, char* argv[])
 {
 	// global variables declaration
@@ -21,10 +23,12 @@ int main(int argc, char* argv[])
 	double startval, basefreq, ratio;
 	FILE* fp;
 	errno_t errfp;
+	int append;
 	double intervals[25];
 
+
 	// check for '-' sign (a flag) in argv[i][0] step through the pointer with argv++ and argc--
-	
+
 	while (argc > 1)
 	{
 		if (argv[1][0] == '-')
@@ -33,6 +37,8 @@ int main(int argc, char* argv[])
 				ismidi = 1;
 			else if (argv[1][1] == 'i')
 				write_interval = 1;
+			else if (argv[1][1] == 'a')
+				append = 1;
 			else
 			{
 				printf("Error: unrecognized option %s\n.", argv[1]);
@@ -51,23 +57,16 @@ int main(int argc, char* argv[])
 	if (argc < 3)
 	{
 		printf("Error: insufficient arguments.\n");
-		printf("Usage: iscale [-m] [-i] N startval [outfile.txt]\n"
+		printf("Usage: iscale [-m] [-i] [-a] N startval [outfile.txt]\n"
 			"-m: interpret startval as a MIDI note (default: interpret as frequency in Hertz)\n"
 			"-i: print interval ratios as well as frequency values(default: print just frequency values)\n"
+			"-a: appends output to outfile.txt instead of overwriting it\n"
 			"outfile.txt : name of(optional) file to output to");
 		return 1;
 	}
 
 	// if we got here we should have the correct amount of arguments to process
-	
-	// first of all lets check that the user hasn't entered characters instead of numbers
-	while (atoi(argv[1] == 0) 
-	{
-		printf("An invalid character has been entered: skipping it...");
-		argc--;
-		argv++;
-	}
-	
+
 	// now on to check if the inputs are whithin range
 	notes = atoi(argv[1]);
 	if (notes < 1 || notes > 24)
@@ -98,7 +97,11 @@ int main(int argc, char* argv[])
 	fp = NULL;
 	if (argc == 4)
 	{
-		errfp = fopen_s(&fp, *argv[3], "w");
+		if(!append)
+			errfp = fopen_s(&fp, argv[3], "w");
+		else if (append)
+			errfp = fopen_s(&fp, argv[3], "a");
+
 		if (errfp == 0)
 			printf("no errors in err: %s", err);
 		if (fp == NULL)
@@ -135,17 +138,33 @@ int main(int argc, char* argv[])
 			printf("%d:\t%f\t%f\n", i, pow(ratio, i), intervals[i]);
 		else
 			printf("%d:\t%f\n", i, intervals[i]);
+	}
 
-		if (fp)
+	if (fp)
+	{
+		if (append)
 		{
+			fprintf(fp, "-----------------------------------------\n");
+			fprintf(fp, "iscale.exe ");
+			if (ismidi)
+				fprintf(fp, "-m ");
+			if (write_interval)
+				fprintf(fp, "-i ");
+			if (append)
+				fprintf(fp, "-a");
+			/*fprintf(fp, "%d %d %s", startval, intervals[].length, fp.name);*/
+		}
+
+		for (i = 0; i < notes; i++) {
 			if (write_interval)
 				err = fprintf(fp, "%d:\t%f\t%f\n", i, pow(ratio, i), intervals[i]);
 			else
-				printf("%d:\t%f\n", i, intervals[i]);
+				fprintf("%d:\t%f\n", i, intervals[i]);
 			if (err < 0)
 				break;
 		}
 	}
+	
 
 	if (err < 0)
 		perror("There was an error writing the file.\n");
