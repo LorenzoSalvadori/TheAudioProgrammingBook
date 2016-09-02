@@ -12,6 +12,7 @@ outfile.txt: name of (optional) file to output to
 #include<stdlib.h>
 #include<math.h>
 #include<errno.h>
+#include<string.h>
 
 int main(int argc, char* argv[])
 {
@@ -25,10 +26,30 @@ int main(int argc, char* argv[])
 	errno_t errfp;
 	int append;
 	double intervals[25];
-
+	
+	const int buffsize = 512;
+	char cmdstring[512];
+	cmdstring[0] = '\0';
+	
+	// stores the cmd line input
+	for (int i = 0; i < argc; i++)
+	{
+		strcat_s(cmdstring, buffsize, argv[i]);
+		if (i == 0)
+		{
+			strcat_s(cmdstring, buffsize, ".exe ");
+		}
+		else if (i+1 == argc)
+		{
+			strcat_s(cmdstring, buffsize, "\n");
+		}
+		else
+		{
+			strcat_s(cmdstring, buffsize, " ");
+		}
+	}
 
 	// check for '-' sign (a flag) in argv[i][0] step through the pointer with argv++ and argc--
-
 	while (argc > 1)
 	{
 		if (argv[1][0] == '-')
@@ -103,7 +124,7 @@ int main(int argc, char* argv[])
 			errfp = fopen_s(&fp, argv[3], "a");
 
 		if (errfp == 0)
-			printf("no errors in err: %s", err);
+			printf("no errors in err: %s\n", err);
 		if (fp == NULL)
 		{
 			printf("WARNING: unable to create file %s\n", argv[3]);
@@ -112,7 +133,6 @@ int main(int argc, char* argv[])
 	}
 
 	// if we got here the user has been nice and we can perform the operations
-
 	if (ismidi)
 	{
 		double c0, c5;
@@ -145,14 +165,7 @@ int main(int argc, char* argv[])
 		if (append)
 		{
 			fprintf(fp, "-----------------------------------------\n");
-			fprintf(fp, "iscale.exe ");
-			if (ismidi)
-				fprintf(fp, "-m ");
-			if (write_interval)
-				fprintf(fp, "-i ");
-			if (append)
-				fprintf(fp, "-a");
-			/*fprintf(fp, "%d %d %s", startval, intervals[].length, fp.name);*/
+			fprintf(fp, "%s ", cmdstring);
 		}
 
 		for (i = 0; i < notes; i++) {
